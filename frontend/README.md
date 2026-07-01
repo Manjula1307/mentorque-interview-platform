@@ -3,7 +3,7 @@
 Live demo: https://mentorque-interview-platform.vercel.app/
 
 ## Local Setup
-1. `git clone [your repo url]`
+1. `git clone https://github.com/Manjula1307/mentorque-interview-platform.git`
 2. `cd backend && npm install`
 3. Create `backend/.env` with DATABASE_URL, JWT_SECRET, GROQ_API_KEY, PORT
 4. `npm run dev` (from backend)
