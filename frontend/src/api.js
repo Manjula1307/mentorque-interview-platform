@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000'
+  baseURL: 'https://mentorque-interview-platform.onrender.com'
 })
 
 // Automatically attach JWT token to every request
