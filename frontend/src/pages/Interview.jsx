@@ -20,6 +20,7 @@ export default function Interview() {
   const synthRef = useRef(window.speechSynthesis)
   const transcriptEndRef = useRef(null)
   const statusRef = useRef(status)
+  const accumulatedTranscriptRef = useRef('')
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -63,25 +64,29 @@ export default function Interview() {
     recognition.onstart = () => {
       setIsListening(true)
       setStatus('listening')
-      setCandidateTranscript('')
+      
     }
 
-    recognition.onresult = (event) => {
-  let interimTranscript = ''
-  let finalTranscript = ''
+   recognition.onresult = (event) => {
+      let interimTranscript = ''
+      let finalTranscript = ''
 
-  for (let i = 0; i < event.results.length; i++) {
-    const t = event.results[i][0].transcript
-    if (event.results[i].isFinal) {
-      finalTranscript += t
-    } else {
-      interimTranscript += t
+      for (let i = 0; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript
+        if (event.results[i].isFinal) {
+          finalTranscript += t
+        } else {
+          interimTranscript += t
+        }
+      }
+
+      // this session's finals get appended to what we already accumulated from prior restarts
+      const combined = accumulatedTranscriptRef.current
+        ? accumulatedTranscriptRef.current + ' ' + finalTranscript
+        : finalTranscript
+
+      setCandidateTranscript((combined + ' ' + interimTranscript).trim())
     }
-  }
-
-  // Show final + interim combined so nothing disappears
-  setCandidateTranscript(finalTranscript + interimTranscript)
-}
 
     recognition.onerror = (event) => {
     if (event.error === 'network') {
@@ -96,12 +101,14 @@ export default function Interview() {
     }
   }
 
-  recognition.onend = () => {
-    if (statusRef.current === 'listening') {
-      setTimeout(() => startListening(), 300)
-    }
-  }
+    recognition.onend = () => {
+      // lock in whatever was finalized before this session closed
+      accumulatedTranscriptRef.current = candidateTranscript.trim()
 
+      if (statusRef.current === 'listening') {
+        setTimeout(() => startListening(), 300)
+      }
+    }
     recognitionRef.current = recognition
     recognition.start()
   }, [])
@@ -124,6 +131,7 @@ export default function Interview() {
     // Add candidate message to display
     setTranscript(prev => [...prev, { speaker: 'candidate', content: spokenText }])
     setCandidateTranscript('')
+    accumulatedTranscriptRef.current = ''
     setStatus('processing')
 
     try {
