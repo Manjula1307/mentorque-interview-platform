@@ -1,16 +1,16 @@
-# React + Vite
+# Mentorque — AI Mock Interview Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Live demo: https://mentorque-interview-platform.vercel.app/
 
-Currently, two official plugins are available:
+## Local Setup
+1. `git clone [your repo url]`
+2. `cd backend && npm install`
+3. Create `backend/.env` with DATABASE_URL, JWT_SECRET, GROQ_API_KEY, PORT
+4. `npm run dev` (from backend)
+5. In a new terminal: `cd frontend && npm install && npm run dev`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
+React + Vite, Node/Express, PostgreSQL (Supabase), JWT auth, Groq (Llama 3.3 70B) for the conversation engine, Web Speech API for voice (browser-native STT/TTS, chosen to avoid third-party voice service costs).
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Core Loop
+Every candidate turn is transcribed via Web Speech API, appended to the session's message history in Postgres, and the full history is sent to the LLM on each turn — so every response is grounded in the actual conversation, not a fixed script.
